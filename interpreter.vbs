@@ -19,7 +19,6 @@
 'SOFTWARE.
 
 '//DOCUMENTATION
-'LANGUAGE:
 '
 'this is a stack-oriented interpreted language written in vbscript
 'it supports only integers
@@ -32,15 +31,15 @@
 '
 'comments are signaled by a ' or the word rem
 '
-'to execute a file with it, pass it's path as an argument to this program
+'to execute a file with it, pass its path as an argument to this program
 '
 'big thanks to @Charles Ma on stackOverflow, who provided an important part of the language specification in the question 'How would I go about writing an interpreter in C? [closed]'
 '
 'INSTRUCTIONS:
-' push <num> : push a number on to the stack
+' push <num>		: push a number on to the stack
 ' pop [register] 	: pop off the first number on the stack. The 'register' operand is optional, you may use it if you want to pop the value into a register
 ' add			: pop off the top 2 items on the stack and push their sum on to the stack
-' sub			: pop off the top 2 items on the stack and push their difference on to the stack
+' sub			: pop off the top 2 items on the stack and push stack(sp) - stack(sp-1) on to the stack
 ' ifeq <label>		: examine the top of the stack; if it's 0, continue, else, jump to the specified label
 ' jump <label>		: jump to the specified label
 ' print			: print the value at the top of the stack
@@ -110,6 +109,9 @@ if file.size = 0 then
 end if
 set textstream = file.openastextstream
 source = textstream.readall
+
+'//this language is case insensitive
+source = lcase(source)
 
 '//registers and stack
 dim ip, sp, a, b, c, d
