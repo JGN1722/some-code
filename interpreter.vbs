@@ -37,23 +37,16 @@
 'big thanks to @Charles Ma on stackOverflow, who provided an important part of the language specification in the question 'How would I go about writing an interpreter in C? [closed]'
 '
 'INSTRUCTIONS:
-' push <num> : push a number on To the stack
-' 
-' pop [register] : pop off the first number on the stack. The 'register' operand is optional, you may use it if you want to pop the value into a register
-' 
-' add : pop off the top 2 items on the stack And push their sum on To the stack. (remember you can add negative numbers, so you have subtraction covered too). You can also get multiplication by creating a loop using some of the other instructions with this one.
-' 
-' ifeq <label> : examine the top of the stack, If it's 0, continue, else, jump to <address> where <address> is a line number
-'
-' jump <label> : jump To a line number
-'
-' print : print the value at the top of the stack
-' 
-' dup : push a copy of what's at the top of the stack
-'
-' mov : puts a value
-'
-' end : ends the program. The interpreter will automatically add one at the end of the source
+' push <num> : push a number on to the stack
+' pop [register] 	: pop off the first number on the stack. The 'register' operand is optional, you may use it if you want to pop the value into a register
+' add			: pop off the top 2 items on the stack and push their sum on to the stack
+' sub			: pop off the top 2 items on the stack and push their difference on to the stack
+' ifeq <label>		: examine the top of the stack; if it's 0, continue, else, jump to the specified label
+' jump <label>		: jump to the specified label
+' print			: print the value at the top of the stack
+' dup			: push a copy of what's at the top of the stack
+' mov			: puts a value into a register
+' end			: ends the program. The interpreter will automatically add one at the end of the source
 '
 '
 '//EXAMPLES
@@ -263,6 +256,11 @@ function ExecuteLine(line,lineNumber)
 		
 		case "add"
 			stack(sp-1) = cstr(cint(stack(sp)) + cint(stack(sp-1)))
+			stack(sp) = 0
+			sp = sp-1
+		
+		case "sub"
+			stack(sp-1) = cstr(cint(stack(sp)) - cint(stack(sp-1)))
 			stack(sp) = 0
 			sp = sp-1
 		
