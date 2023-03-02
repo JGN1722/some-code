@@ -18,8 +18,6 @@
 'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 'SOFTWARE.
 
-
-
 '//DOCUMENTATION
 'LANGUAGE:
 '
@@ -30,6 +28,7 @@
 'and sp, used to point at the top of the stack
 'the value of each registers can be accessed manually by the programmer
 'the interpreter doesn't mind if there's garbage at the end of a line
+'uninitialized stack items are empty, you can see it by incrementing sp and printing
 '
 'comments are signaled by a ' or the word rem
 '
@@ -40,7 +39,7 @@
 'INSTRUCTIONS:
 ' push <num> : push a number on To the stack
 ' 
-' pop : pop off the first number on the stack
+' pop [register] : pop off the first number on the stack. The 'register' operand is optional, you may use it if you want to pop the value into a register
 ' 
 ' add : pop off the top 2 items on the stack And push their sum on To the stack. (remember you can add negative numbers, so you have subtraction covered too). You can also get multiplication by creating a loop using some of the other instructions with this one.
 ' 
@@ -54,7 +53,7 @@
 '
 ' mov : puts a value
 '
-' end : ends the program. The interpreter will encounter an error if you don't use it to end the script
+' end : ends the program. The interpreter will automatically add one at the end of the source
 '
 '
 '//EXAMPLES
@@ -82,9 +81,6 @@
 '
 'end
 
-
-
-
 Option Explicit
 
 '//objects
@@ -97,7 +93,7 @@ set labeladdresses = createobject("scripting.dictionary")
 
 '//this regex will be used to ensure that only integers are pushed
 '//to the stack
-intregex.pattern = "^[0-9]+$"
+intregex.pattern = "^[0-9\-]+$"
 
 '//the regex object will be used to detect if a line is a label
 labelregex.pattern = "^[A-Za-z0-9_]+:$"
@@ -153,6 +149,11 @@ for i=0 to ubound(temparr)
 	if not element = "" then
 		'//ignore the comments as well
 		if not left(element,1) = "'" and not left(element,3) = "rem" then
+			if instr(element,"'") then
+				element = left(element,instr(element,"'")-1)
+			elseif instr(element,"rem") then
+				element = left(element,instr(element,"rem")-1)
+			end if
 			'//if we're here, then the line is a line of code or a label
 			'//add it to the result
 			result = result + element + vbcrlf
@@ -178,6 +179,11 @@ for i=0 to ubound(temparr)
 		
 	end if
 next
+
+
+'//add an 'end' instruction at the end of the program because else if the user forget to add it the interpreter
+'//will encounter an error
+result = result & vbcrlf & "end"
 
 '//finally, let's put our result into the source variable
 source = result
@@ -234,6 +240,24 @@ function ExecuteLine(line,lineNumber)
 			stack(sp) = Eval(tokens(1))
 		
 		case "pop"
+			if ubound(tokens) > 0 then
+				select case tokens(1)
+					case "a"
+						a = stack(sp)
+					case "b"
+						b = stack(sp)
+					case "c"
+						c = stack(sp)
+					case "d"
+						d = stack(sp)
+					case "sp"
+						sp = stack(sp)
+					case "ip"
+						ip = stack(sp)
+					case else
+						throwerror lineNumber,"invalid register name: "+tokens(1)
+				end select
+			end if
 			stack(sp) = 0
 			sp = sp - 1
 		
